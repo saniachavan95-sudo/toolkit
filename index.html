@@ -1,0 +1,1078 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>My Toolkit</title>
+  <style>
+    body {
+      font-family: "Segoe UI", Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      background: linear-gradient(135deg, #1e3c72, #2a5298);
+    }
+    /* Fixed size, so every screen keeps the same card size */
+    .card {
+      box-sizing: border-box;
+      width: 520px;
+      height: 720px;
+      padding: 24px 40px;
+      display: flex;
+      flex-direction: column;
+      background: #fafafa;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      text-align: center;
+    }
+
+    /* Top bar: Back button, page title, and an empty spacer to keep the title centered */
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      min-height: 44px;
+      margin-bottom: 8px;
+    }
+    .topbar h2 {
+      margin: 0;
+      font-size: 20px;
+      color: #1e3c72;
+    }
+    .backBtn {
+      font-family: "Segoe UI", Arial, sans-serif;
+      font-size: 14px;
+      font-weight: bold;
+      padding: 8px 16px;
+      min-width: 0;
+      margin: 0;
+      border: none;
+      border-radius: 20px;
+      background: #7f8c8d;
+      color: white;
+      cursor: pointer;
+      box-shadow: none;
+    }
+    .backBtn:hover {
+      background: #646f70;
+    }
+    .invisible {
+      visibility: hidden;
+    }
+
+    /* The area below the top bar where each screen appears */
+    .screen {
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+    }
+    .hidden {
+      display: none !important;
+    }
+    .page {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      height: 100%;
+    }
+
+    /* Landing page */
+    .landing {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .landing h1 {
+      margin: 0 0 6px;
+      font-size: 32px;
+      color: #1e3c72;
+    }
+    .landing p {
+      margin: 0 0 26px;
+      color: #666;
+      font-size: 16px;
+    }
+    .tiles {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      width: 100%;
+      max-width: 400px;
+    }
+    .tile {
+      font-family: "Segoe UI", Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      padding: 24px 10px;
+      margin: 0;
+      min-width: 0;
+      border: none;
+      border-radius: 16px;
+      cursor: pointer;
+      color: white;
+      font-size: 17px;
+      font-weight: bold;
+      background: linear-gradient(145deg, var(--c1), var(--c2));
+      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.25);
+      transition: transform 0.15s, box-shadow 0.2s;
+    }
+    .tile:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.35);
+    }
+    .tile:active {
+      transform: scale(0.96);
+    }
+    .tile .icon {
+      font-size: 34px;
+    }
+
+    /* Shared dial and readout styles */
+    .face {
+      width: 300px;
+      height: 340px;
+      display: block;
+      margin: 0 auto;
+    }
+    .panel {
+      width: 100%;
+      height: 340px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      box-sizing: border-box;
+    }
+    .label {
+      font-size: 18px;
+      color: #333;
+      margin: 0;
+    }
+    .dateInput {
+      font-size: 18px;
+      padding: 6px 10px;
+      border: 1px solid #bbb;
+      border-radius: 8px;
+      text-align: center;
+    }
+    .info {
+      font-size: 16px;
+      color: #333;
+      line-height: 1.6;
+      margin-top: 6px;
+    }
+    .readout {
+      display: inline-block;
+      margin: 12px 0 16px;
+      background: #1c1c1c;
+      color: #f5f0d8;
+      padding: 6px 16px;
+      border-radius: 8px;
+      border: 2px solid #333;
+      font-size: 26px;
+      font-weight: bold;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: 2px;
+      min-width: 200px;
+    }
+    .readout.small {
+      font-size: 20px;
+      letter-spacing: 1px;
+      white-space: nowrap;
+    }
+    .readout.wide {
+      font-size: 18px;
+      letter-spacing: 1px;
+      max-width: 100%;
+      box-sizing: border-box;
+    }
+    #timerDisplay {
+      cursor: text;
+      outline: none;
+    }
+    #timerDisplay:focus {
+      box-shadow: 0 0 0 3px #2ecc71;
+    }
+    .buttons {
+      display: flex;
+      justify-content: center;
+    }
+    .bottom {
+      margin-top: 14px;
+      width: 100%;
+      height: 110px;
+    }
+    .hint {
+      font-size: 14px;
+      color: #666;
+      margin: 14px 0 0;
+    }
+
+    /* Action buttons */
+    button {
+      font-family: "Segoe UI", Arial, sans-serif;
+      font-size: 18px;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      padding: 12px 18px;
+      margin: 0 4px;
+      min-width: 100px;
+      border: none;
+      border-radius: 30px;
+      cursor: pointer;
+      color: white;
+      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.3);
+      transition: transform 0.15s, box-shadow 0.2s, filter 0.2s;
+    }
+    #startBtn, #timerStartBtn {
+      background: linear-gradient(145deg, #2ecc71, #1e8449);
+    }
+    #startBtn:hover, #timerStartBtn:hover {
+      box-shadow: 0 8px 18px rgba(46, 204, 113, 0.6);
+      transform: translateY(-2px);
+    }
+    #resetBtn, #timerResetBtn {
+      background: linear-gradient(145deg, #ff6b5b, #c0392b);
+    }
+    #resetBtn:hover, #timerResetBtn:hover {
+      box-shadow: 0 8px 18px rgba(231, 76, 60, 0.6);
+      transform: translateY(-2px);
+    }
+    #lapBtn {
+      background: linear-gradient(145deg, #4a7bd0, #1e3c72);
+    }
+    #lapBtn:hover {
+      box-shadow: 0 8px 18px rgba(42, 82, 152, 0.6);
+      transform: translateY(-2px);
+    }
+    button:active {
+      transform: scale(0.95);
+    }
+
+    /* Lap list */
+    #laps {
+      list-style: none;
+      padding: 0 12px;
+      margin: 0;
+      height: 100%;
+      overflow-y: auto;
+      font-size: 18px;
+      color: #333;
+      background: #f4f4f4;
+      border-radius: 10px;
+      box-sizing: border-box;
+    }
+    #laps li {
+      padding: 6px 0;
+      border-bottom: 1px solid #ddd;
+      font-family: "Courier New", monospace;
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* Unit converter */
+    #unitCategory {
+      font-size: 18px;
+      padding: 6px 10px;
+      border: 1px solid #bbb;
+      border-radius: 8px;
+    }
+    .unitRow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      width: 100%;
+    }
+    .unitInput {
+      width: 140px;
+      font-size: 18px;
+      padding: 6px 10px;
+      border: 1px solid #bbb;
+      border-radius: 8px;
+      text-align: center;
+    }
+    .unitSelect {
+      font-size: 16px;
+      padding: 6px;
+      border: 1px solid #bbb;
+      border-radius: 8px;
+      width: 150px;
+    }
+    /* Tool cursors: each tool has its own icon, shown on its tile and its page */
+    :root {
+      --cur-stopwatch: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='18' r='11' fill='%231e3c72' stroke='white' stroke-width='2'/%3E%3Crect x='14' y='2' width='4' height='5' rx='1' fill='%231e3c72'/%3E%3Cline x1='16' y1='18' x2='16' y2='10' stroke='%23e74c3c' stroke-width='2' stroke-linecap='round'/%3E%3Ccircle cx='16' cy='18' r='1.5' fill='white'/%3E%3C/svg%3E") 16 18, auto;
+      --cur-timer: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='13' fill='%23c0392b' stroke='white' stroke-width='2'/%3E%3Cpath d='M11 9h10M11 23h10M12 9l8 7-8 7M20 9l-8 7 8 7' stroke='white' stroke-width='2' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") 16 16, auto;
+      --cur-age: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='13' fill='%23d68910' stroke='white' stroke-width='2'/%3E%3Crect x='9' y='15' width='14' height='8' rx='1' fill='white'/%3E%3Cline x1='16' y1='10' x2='16' y2='15' stroke='white' stroke-width='2'/%3E%3Ccircle cx='16' cy='9' r='1.5' fill='%23e74c3c'/%3E%3C/svg%3E") 16 16, auto;
+      --cur-days: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='13' fill='%232874a6' stroke='white' stroke-width='2'/%3E%3Crect x='9' y='9' width='14' height='14' rx='2' fill='white'/%3E%3Crect x='9' y='9' width='14' height='4' rx='1' fill='%23e74c3c'/%3E%3C/svg%3E") 16 16, auto;
+      --cur-units: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='13' fill='%236c3483' stroke='white' stroke-width='2'/%3E%3Crect x='7' y='13' width='18' height='6' rx='1' fill='white' transform='rotate(-45 16 16)'/%3E%3Cline x1='16' y1='16' x2='19' y2='13' stroke='%236c3483' stroke-width='1.5' transform='rotate(-45 16 16)'/%3E%3C/svg%3E") 16 16, auto;
+    }
+
+    /* Tile on the landing page and the page itself, including its buttons */
+    [data-page="stopwatch"], #stopwatchPage, #stopwatchPage button { cursor: var(--cur-stopwatch); }
+    [data-page="timer"], #timerPage, #timerPage button { cursor: var(--cur-timer); }
+    [data-page="age"], #agePage, #agePage input { cursor: var(--cur-age); }
+    [data-page="days"], #daysPage, #daysPage input { cursor: var(--cur-days); }
+    [data-page="units"], #unitsPage, #unitsPage select, #unitsPage input { cursor: var(--cur-units); }
+
+  </style>
+</head>
+<body>
+  <div class="card">
+
+    <!-- Top bar: Back button appears on every tool page -->
+    <div class="topbar">
+      <button id="backBtn" class="backBtn invisible">&larr; Back</button>
+      <h2 id="pageTitle">My Toolkit</h2>
+      <span style="width: 80px;"></span>
+    </div>
+
+    <div class="screen">
+
+      <!-- LANDING PAGE -->
+      <div id="landing" class="landing">
+        <h1>My Toolkit</h1>
+        <p>Pick a tool to get started</p>
+        <div class="tiles">
+          <button class="tile" data-page="stopwatch" style="--c1:#2ecc71; --c2:#1e8449;">
+            <span class="icon">&#9201;</span>Stopwatch
+          </button>
+          <button class="tile" data-page="timer" style="--c1:#ff6b5b; --c2:#c0392b;">
+            <span class="icon">&#9203;</span>Timer
+          </button>
+          <button class="tile" data-page="age" style="--c1:#f5b041; --c2:#d68910;">
+            <span class="icon">&#127874;</span>Age
+          </button>
+          <button class="tile" data-page="days" style="--c1:#5dade2; --c2:#2874a6;">
+            <span class="icon">&#128197;</span>Days Between
+          </button>
+          <button class="tile" data-page="units" style="--c1:#af7ac5; --c2:#6c3483;">
+            <span class="icon">&#128207;</span>Unit Converter
+          </button>
+        </div>
+      </div>
+
+      <!-- STOPWATCH PAGE -->
+      <div id="stopwatchPage" class="page hidden">
+        <svg id="face" class="face" viewBox="0 0 300 340">
+          <defs>
+            <linearGradient id="metal" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#f5f5f5"/>
+              <stop offset="0.5" stop-color="#9ea3a8"/>
+              <stop offset="1" stop-color="#5f6469"/>
+            </linearGradient>
+          </defs>
+
+          <!-- Crown (pusher and stem) on top -->
+          <rect x="136" y="2" width="28" height="20" rx="4" fill="url(#metal)" stroke="#444" stroke-width="1.5"/>
+          <rect x="144" y="20" width="12" height="28" fill="url(#metal)" stroke="#444" stroke-width="1"/>
+
+          <!-- Metal case and cream dial -->
+          <circle cx="150" cy="180" r="140" fill="url(#metal)" stroke="#444" stroke-width="2"/>
+          <circle cx="150" cy="180" r="122" fill="#f8f4e6" stroke="#333" stroke-width="2"/>
+
+          <!-- Minute sub-dial -->
+          <circle cx="150" cy="232" r="24" fill="#fffdf5" stroke="#555" stroke-width="2"/>
+        </svg>
+        <div id="display" class="readout">00:00.00</div>
+        <div class="buttons">
+          <button id="startBtn">Start</button>
+          <button id="resetBtn">Reset</button>
+          <button id="lapBtn">Lap</button>
+        </div>
+        <div class="bottom">
+          <ul id="laps"></ul>
+        </div>
+      </div>
+
+      <!-- TIMER PAGE -->
+      <div id="timerPage" class="page hidden">
+        <svg id="timerFace" class="face" viewBox="0 0 300 340"></svg>
+        <div id="timerDisplay" class="readout" contenteditable="true" spellcheck="false">01:00.00</div>
+        <div class="buttons">
+          <button id="timerStartBtn">Start</button>
+          <button id="timerResetBtn">Reset</button>
+        </div>
+        <div class="bottom">
+          <p class="hint">Click the time and type, e.g. 90, 2:30, or 1:02:00</p>
+        </div>
+      </div>
+
+      <!-- AGE PAGE -->
+      <div id="agePage" class="page hidden">
+        <div class="panel">
+          <p class="label">Date of birth</p>
+          <input type="date" id="birthInput" class="dateInput">
+          <div id="ageResult" class="readout small">--</div>
+          <div id="ageDetails" class="info"></div>
+        </div>
+        <div class="bottom">
+          <p class="hint">Pick your date of birth to see your exact age.</p>
+        </div>
+      </div>
+
+      <!-- DAYS PAGE -->
+      <div id="daysPage" class="page hidden">
+        <div class="panel">
+          <p class="label">From</p>
+          <input type="datetime-local" id="fromInput" class="dateInput">
+          <p class="label">To</p>
+          <input type="datetime-local" id="toInput" class="dateInput">
+          <div id="daysResult" class="readout wide">--</div>
+        </div>
+        <div class="bottom">
+          <p class="hint">Pick two dates and times to see the time between them.</p>
+        </div>
+      </div>
+
+      <!-- UNITS PAGE -->
+      <div id="unitsPage" class="page hidden">
+        <div class="panel">
+          <select id="unitCategory" class="unitSelect" style="width: 200px;">
+            <option value="length">Length</option>
+            <option value="weight">Weight</option>
+            <option value="temperature">Temperature</option>
+          </select>
+          <div class="unitRow">
+            <input type="number" id="unitA" class="unitInput" value="1">
+            <select id="unitAType" class="unitSelect"></select>
+          </div>
+          <p class="label">=</p>
+          <div class="unitRow">
+            <input type="number" id="unitB" class="unitInput">
+            <select id="unitBType" class="unitSelect"></select>
+          </div>
+        </div>
+        <div class="bottom">
+          <p class="hint">Type in either box and the other one updates.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    const NS = "http://www.w3.org/2000/svg";
+    const CX = 150;
+    const CY = 180;
+    const SUB_Y = 232;
+
+    // ----- NAVIGATION -----
+    const landing = document.getElementById("landing");
+    const backBtn = document.getElementById("backBtn");
+    const pageTitle = document.getElementById("pageTitle");
+
+    const SCREENS = {
+      stopwatch: document.getElementById("stopwatchPage"),
+      timer: document.getElementById("timerPage"),
+      age: document.getElementById("agePage"),
+      days: document.getElementById("daysPage"),
+      units: document.getElementById("unitsPage")
+    };
+
+    const TITLES = {
+      stopwatch: "Stopwatch",
+      timer: "Timer",
+      age: "Age",
+      days: "Days Between",
+      units: "Unit Converter"
+    };
+
+    let currentPage = null;   // null means the landing page
+
+    function showPage(name) {
+      resetStopwatch();
+      resetCountdown();
+      currentPage = name;
+
+      landing.classList.add("hidden");
+      for (const key in SCREENS) {
+        SCREENS[key].classList.toggle("hidden", key !== name);
+      }
+      backBtn.classList.remove("invisible");
+      pageTitle.textContent = TITLES[name];
+    }
+
+    function showLanding() {
+      resetStopwatch();
+      resetCountdown();
+      currentPage = null;
+
+      landing.classList.remove("hidden");
+      for (const key in SCREENS) {
+        SCREENS[key].classList.add("hidden");
+      }
+      backBtn.classList.add("invisible");
+      pageTitle.textContent = "My Toolkit";
+    }
+
+    document.querySelectorAll(".tile").forEach(tile => {
+      tile.addEventListener("click", () => showPage(tile.dataset.page));
+    });
+    backBtn.addEventListener("click", showLanding);
+
+    // Creates an SVG shape and adds it to a dial
+    function svgEl(parent, tag, attrs) {
+      const el = document.createElementNS(NS, tag);
+      for (const name in attrs) {
+        el.setAttribute(name, attrs[name]);
+      }
+      parent.appendChild(el);
+      return el;
+    }
+
+    // Converts a position on the dial (0 = top) into x and y coordinates
+    function polar(cx, cy, radius, degrees) {
+      const rad = degrees * Math.PI / 180;
+      return {
+        x: cx + radius * Math.sin(rad),
+        y: cy - radius * Math.cos(rad)
+      };
+    }
+
+    // Draws the 60 tick marks and the numbers 5 to 60 (shared by both dials)
+    function drawDialMarks(dial) {
+      for (let i = 0; i < 60; i++) {
+        const isMajor = i % 5 === 0;
+        const outer = polar(CX, CY, 120, i * 6);
+        const inner = polar(CX, CY, isMajor ? 104 : 112, i * 6);
+        svgEl(dial, "line", {
+          x1: inner.x, y1: inner.y,
+          x2: outer.x, y2: outer.y,
+          stroke: "#222",
+          "stroke-width": isMajor ? 3 : 1.2
+        });
+      }
+
+      for (let i = 0; i < 60; i += 5) {
+        const pos = polar(CX, CY, 90, i * 6);
+        const label = svgEl(dial, "text", {
+          x: pos.x,
+          y: pos.y + 6,
+          "text-anchor": "middle",
+          "font-family": "Georgia, serif",
+          "font-size": 16,
+          "font-weight": "bold",
+          fill: "#222"
+        });
+        label.textContent = i === 0 ? "60" : String(i);
+      }
+    }
+
+    // Converts seconds into text like 05.32, 01:05.32, or 01:02:05.32
+    function formatTime(seconds) {
+      seconds = Math.floor(seconds * 100) / 100;
+
+      const hours = Math.floor(seconds / 3600);
+      const minutes = Math.floor((seconds % 3600) / 60);
+      const secs = seconds % 60;
+
+      const secsText = secs.toFixed(2).padStart(5, "0");
+      const minsText = String(minutes).padStart(2, "0");
+      const hoursText = String(hours).padStart(2, "0");
+
+      if (hours > 0) {
+        return `${hoursText}:${minsText}:${secsText}`;
+      }
+      return `${minsText}:${secsText}`;
+    }
+
+    // ----- STOPWATCH -----
+    const display = document.getElementById("display");
+    const startBtn = document.getElementById("startBtn");
+    const resetBtn = document.getElementById("resetBtn");
+    const lapBtn = document.getElementById("lapBtn");
+    const lapList = document.getElementById("laps");
+    const face = document.getElementById("face");
+
+    let startTime = 0;
+    let elapsed = 0;
+    let timerId = null;
+    let lapCount = 0;
+    let lastLapTime = 0;
+
+    let secondHand = null;
+    let minuteHand = null;
+
+    function drawFace() {
+      drawDialMarks(face);
+
+      minuteHand = svgEl(face, "line", {
+        x1: CX, y1: SUB_Y + 4,
+        x2: CX, y2: SUB_Y - 18,
+        stroke: "#333",
+        "stroke-width": 2,
+        "stroke-linecap": "round"
+      });
+
+      secondHand = svgEl(face, "line", {
+        x1: CX, y1: CY + 25,
+        x2: CX, y2: 70,
+        stroke: "#c0392b",
+        "stroke-width": 2.5,
+        "stroke-linecap": "round"
+      });
+
+      svgEl(face, "circle", { cx: CX, cy: CY, r: 6, fill: "#222" });
+    }
+
+    function setHands(seconds) {
+      const secondsDeg = (seconds % 60) * 6;
+      const minutesDeg = (Math.floor(seconds / 60) % 60) * 6;
+      secondHand.setAttribute("transform", `rotate(${secondsDeg} ${CX} ${CY})`);
+      minuteHand.setAttribute("transform", `rotate(${minutesDeg} ${CX} ${SUB_Y})`);
+    }
+
+    function update() {
+      const now = Date.now();
+      const total = elapsed + (now - startTime) / 1000;
+      display.textContent = formatTime(total);
+      setHands(total);
+    }
+
+    function stopStopwatch() {
+      clearInterval(timerId);
+      timerId = null;
+      startBtn.textContent = "Start";
+    }
+
+    startBtn.addEventListener("click", () => {
+      if (timerId === null) {
+        startTime = Date.now();
+        timerId = setInterval(update, 50);
+        startBtn.textContent = "Stop";
+      } else {
+        elapsed += (Date.now() - startTime) / 1000;
+        stopStopwatch();
+      }
+    });
+
+    resetBtn.addEventListener("click", () => {
+      stopStopwatch();
+      elapsed = 0;
+      lapCount = 0;
+      lastLapTime = 0;
+      lapList.innerHTML = "";
+      display.textContent = formatTime(0);
+      setHands(0);
+    });
+
+    lapBtn.addEventListener("click", () => {
+      if (timerId === null) return;
+
+      lapCount++;
+      const current = elapsed + (Date.now() - startTime) / 1000;
+      const split = current - lastLapTime;
+      lastLapTime = current;
+
+      const item = document.createElement("li");
+      item.textContent = `Lap ${lapCount}: ${formatTime(split)}  (total ${formatTime(current)})`;
+      lapList.prepend(item);
+    });
+
+    // ----- TIMER -----
+    const timerFace = document.getElementById("timerFace");
+    const timerDisplay = document.getElementById("timerDisplay");
+    const timerStartBtn = document.getElementById("timerStartBtn");
+    const timerResetBtn = document.getElementById("timerResetBtn");
+
+    let timerTotal = 60;
+    let countdownStart = 0;
+    let countdownLeft = 0;
+    let countdownId = null;
+    let timerHand = null;
+
+    function drawTimerFace() {
+      drawDialMarks(timerFace);
+
+      timerHand = svgEl(timerFace, "line", {
+        x1: CX, y1: CY + 25,
+        x2: CX, y2: 70,
+        stroke: "#c0392b",
+        "stroke-width": 2.5,
+        "stroke-linecap": "round"
+      });
+      svgEl(timerFace, "circle", { cx: CX, cy: CY, r: 6, fill: "#222" });
+    }
+
+    // Turns typed text into seconds. Accepts "90", "2:30", or "1:02:00".
+    // Returns null if the text is not a valid time greater than zero.
+    function parseTime(text) {
+      const parts = text.trim().split(":");
+      if (parts.length > 3) return null;
+
+      const nums = parts.map(p => Number(p));
+      if (nums.some(n => !Number.isFinite(n) || n < 0)) return null;
+
+      let total;
+      if (nums.length === 1) {
+        total = nums[0];
+      } else if (nums.length === 2) {
+        total = nums[0] * 60 + nums[1];
+      } else {
+        total = nums[0] * 3600 + nums[1] * 60 + nums[2];
+      }
+      return total > 0 ? total : null;
+    }
+
+    function showCountdown(left) {
+      timerDisplay.textContent = formatTime(left);
+      timerHand.setAttribute("transform", `rotate(${(left % 60) * 6} ${CX} ${CY})`);
+    }
+
+    function stopCountdown() {
+      clearInterval(countdownId);
+      countdownId = null;
+      timerStartBtn.textContent = "Start";
+      timerDisplay.contentEditable = "true";
+    }
+
+    function tickCountdown() {
+      const left = countdownLeft - (Date.now() - countdownStart) / 1000;
+      if (left <= 0) {
+        countdownLeft = 0;
+        stopCountdown();
+        showCountdown(0);
+        return;
+      }
+      showCountdown(left);
+    }
+
+    timerStartBtn.addEventListener("click", () => {
+      if (countdownId === null) {
+        if (countdownLeft <= 0) countdownLeft = timerTotal;
+        countdownStart = Date.now();
+        countdownId = setInterval(tickCountdown, 50);
+        timerStartBtn.textContent = "Stop";
+        timerDisplay.contentEditable = "false";
+      } else {
+        countdownLeft -= (Date.now() - countdownStart) / 1000;
+        stopCountdown();
+        showCountdown(countdownLeft);
+      }
+    });
+
+    timerResetBtn.addEventListener("click", () => {
+      stopCountdown();
+      countdownLeft = 0;
+      showCountdown(timerTotal);
+    });
+
+    timerDisplay.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        timerDisplay.blur();
+      }
+    });
+
+    timerDisplay.addEventListener("paste", (event) => {
+      event.preventDefault();
+      const text = event.clipboardData.getData("text/plain");
+      document.execCommand("insertText", false, text);
+    });
+
+    timerDisplay.addEventListener("blur", () => {
+      if (countdownId !== null) return;
+      const typed = parseTime(timerDisplay.textContent);
+      if (typed !== null) {
+        timerTotal = Math.max(1, Math.floor(typed));
+      }
+      countdownLeft = 0;
+      showCountdown(timerTotal);
+    });
+
+    function resetStopwatch() {
+      stopStopwatch();
+      elapsed = 0;
+      lapCount = 0;
+      lastLapTime = 0;
+      lapList.innerHTML = "";
+      display.textContent = formatTime(0);
+      setHands(0);
+    }
+
+    function resetCountdown() {
+      stopCountdown();
+      countdownLeft = 0;
+      showCountdown(timerTotal);
+    }
+
+    // ----- DATE HELPERS (shared by Age and Days) -----
+    const pad = (n) => String(n).padStart(2, "0");
+
+    // "YYYY-MM-DD" from a date input -> { y, m, d }
+    function parseDate(str) {
+      if (!str) return null;
+      const [y, m, d] = str.split("-").map(Number);
+      return { y, m, d };
+    }
+
+    // Date -> "YYYY-MM-DD" for a date input
+    function toInputValue(date) {
+      return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+    }
+
+    // Date -> "YYYY-MM-DDTHH:MM" for a datetime-local input
+    function toLocalInput(date) {
+      return `${toInputValue(date)}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+    }
+
+    function todayParts() {
+      const now = new Date();
+      return { y: now.getFullYear(), m: now.getMonth() + 1, d: now.getDate() };
+    }
+
+    // Converts a date to a whole number of days (UTC avoids daylight saving errors)
+    function dayNumber(p) {
+      return Date.UTC(p.y, p.m - 1, p.d) / 86400000;
+    }
+
+    // Days from a to b (positive if b is later)
+    function daysBetween(a, b) {
+      return Math.round(dayNumber(b) - dayNumber(a));
+    }
+
+    // Years, months, and days from one date to another
+    function ageParts(from, to) {
+      let years = to.y - from.y;
+      let months = to.m - from.m;
+      let days = to.d - from.d;
+
+      if (days < 0) {
+        months--;
+        days += new Date(to.y, to.m - 1, 0).getDate();
+      }
+      if (months < 0) {
+        years--;
+        months += 12;
+      }
+      return { years, months, days };
+    }
+
+    // ----- AGE PAGE -----
+    const birthInput = document.getElementById("birthInput");
+    const ageResult = document.getElementById("ageResult");
+    const ageDetails = document.getElementById("ageDetails");
+
+    function updateAge() {
+      const birth = parseDate(birthInput.value);
+      if (!birth) {
+        ageResult.textContent = "--";
+        ageDetails.textContent = "";
+        return;
+      }
+
+      const today = todayParts();
+      if (daysBetween(birth, today) < 0) {
+        ageResult.textContent = "--";
+        ageDetails.textContent = "That date is in the future.";
+        return;
+      }
+
+      const { years, months, days } = ageParts(birth, today);
+      ageResult.textContent = `${years} years, ${months} months, ${days} days`;
+
+      // Next birthday: this year if it hasn't passed yet, otherwise next year
+      let next = { y: today.y, m: birth.m, d: birth.d };
+      if (daysBetween(today, next) < 0) next.y++;
+      const untilBirthday = daysBetween(today, next);
+
+      const totalDays = daysBetween(birth, today).toLocaleString();
+      const birthdayText = untilBirthday === 0
+        ? "Today is your birthday!"
+        : `Next birthday in ${untilBirthday} days`;
+
+      ageDetails.innerHTML = `Total days lived: ${totalDays}<br>${birthdayText}`;
+    }
+
+    birthInput.addEventListener("input", updateAge);
+    birthInput.addEventListener("change", updateAge);
+
+    // ----- DAYS PAGE -----
+    const fromInput = document.getElementById("fromInput");
+    const toInput = document.getElementById("toInput");
+    const daysResult = document.getElementById("daysResult");
+
+    // Reads a datetime-local value into a Date (local time)
+    function parseDateTime(str) {
+      if (!str) return null;
+      const d = new Date(str);
+      return isNaN(d) ? null : d;
+    }
+
+    // Splits the gap between two moments into years, days, hours, and minutes.
+    function splitGap(a, b) {
+      const early = a <= b ? a : b;
+      const late = a <= b ? b : a;
+
+      let years = late.getFullYear() - early.getFullYear();
+      let anchor = new Date(early);
+      anchor.setFullYear(early.getFullYear() + years);
+      if (anchor > late) {
+        years--;
+        anchor = new Date(early);
+        anchor.setFullYear(early.getFullYear() + years);
+      }
+
+      let ms = late - anchor;
+      const days = Math.floor(ms / 86400000);
+      ms -= days * 86400000;
+      const hours = Math.floor(ms / 3600000);
+      ms -= hours * 3600000;
+      const minutes = Math.floor(ms / 60000);
+
+      return { years, days, hours, minutes };
+    }
+
+    function plural(n, word) {
+      return `${n} ${n === 1 ? word : word + "s"}`;
+    }
+
+    function updateDays() {
+      const from = parseDateTime(fromInput.value);
+      const to = parseDateTime(toInput.value);
+      if (!from || !to) {
+        daysResult.textContent = "--";
+        return;
+      }
+
+      const { years, days, hours, minutes } = splitGap(from, to);
+      const parts = [];
+      if (years > 0) parts.push(plural(years, "year"));
+      parts.push(plural(days, "day"));
+      parts.push(plural(hours, "hour"));
+      parts.push(plural(minutes, "minute"));
+      daysResult.textContent = parts.join(", ");
+    }
+
+    fromInput.addEventListener("input", updateDays);
+    fromInput.addEventListener("change", updateDays);
+    toInput.addEventListener("input", updateDays);
+    toInput.addEventListener("change", updateDays);
+
+    // ----- UNITS PAGE -----
+    const UNIT_CATEGORIES = {
+      length: {
+        units: {
+          mm: { name: "Millimeters", toBase: 0.001 },
+          cm: { name: "Centimeters", toBase: 0.01 },
+          m: { name: "Meters", toBase: 1 },
+          km: { name: "Kilometers", toBase: 1000 },
+          in: { name: "Inches", toBase: 0.0254 },
+          ft: { name: "Feet", toBase: 0.3048 },
+          yd: { name: "Yards", toBase: 0.9144 },
+          mi: { name: "Miles", toBase: 1609.344 }
+        }
+      },
+      weight: {
+        units: {
+          g: { name: "Grams", toBase: 0.001 },
+          kg: { name: "Kilograms", toBase: 1 },
+          oz: { name: "Ounces", toBase: 0.028349523125 },
+          lb: { name: "Pounds", toBase: 0.45359237 }
+        }
+      },
+      temperature: {
+        units: {
+          C: { name: "Celsius", toBase: c => c, fromBase: c => c },
+          F: { name: "Fahrenheit", toBase: f => (f - 32) * 5 / 9, fromBase: c => c * 9 / 5 + 32 },
+          K: { name: "Kelvin", toBase: k => k - 273.15, fromBase: c => c + 273.15 }
+        }
+      }
+    };
+
+    const unitCategory = document.getElementById("unitCategory");
+    const unitA = document.getElementById("unitA");
+    const unitB = document.getElementById("unitB");
+    const unitAType = document.getElementById("unitAType");
+    const unitBType = document.getElementById("unitBType");
+
+    function fillUnitMenus() {
+      const units = UNIT_CATEGORIES[unitCategory.value].units;
+      const options = Object.keys(units).map(key =>
+        `<option value="${key}">${units[key].name}</option>`
+      ).join("");
+      unitAType.innerHTML = options;
+      unitBType.innerHTML = options;
+      unitBType.selectedIndex = 1;
+    }
+
+    function convert(value, fromKey, toKey) {
+      const category = UNIT_CATEGORIES[unitCategory.value];
+      const from = category.units[fromKey];
+      const to = category.units[toKey];
+
+      if (unitCategory.value === "temperature") {
+        return to.fromBase(from.toBase(value));
+      }
+      return value * from.toBase / to.toBase;
+    }
+
+    function tidy(n) {
+      return Number(n.toFixed(6)).toString();
+    }
+
+    function fromA() {
+      const value = parseFloat(unitA.value);
+      unitB.value = isNaN(value) ? "" : tidy(convert(value, unitAType.value, unitBType.value));
+    }
+
+    function fromB() {
+      const value = parseFloat(unitB.value);
+      unitA.value = isNaN(value) ? "" : tidy(convert(value, unitBType.value, unitAType.value));
+    }
+
+    unitA.addEventListener("input", fromA);
+    unitAType.addEventListener("change", fromA);
+    unitB.addEventListener("input", fromB);
+    unitBType.addEventListener("change", fromA);
+
+    unitCategory.addEventListener("change", () => {
+      fillUnitMenus();
+      unitA.value = "1";
+      fromA();
+    });
+
+    // ----- KEYBOARD SHORTCUTS (stopwatch page only) -----
+    document.addEventListener("keydown", (event) => {
+      if (event.repeat) return;
+      if (currentPage !== "stopwatch") return;
+      if (event.code === "Space") {
+        event.preventDefault();
+        if (document.activeElement) document.activeElement.blur();
+        startBtn.click();
+      } else if (event.key.toLowerCase() === "r") {
+        resetBtn.click();
+      }
+    });
+
+    // ----- START -----
+    drawFace();
+    drawTimerFace();
+    setHands(0);
+    showCountdown(timerTotal);
+
+    // Days page starts with now and 30 days later
+    const now = new Date();
+    fromInput.value = toLocalInput(now);
+    toInput.value = toLocalInput(new Date(now.getTime() + 30 * 86400000));
+    updateDays();
+
+    // Units page starts with 1 meter in feet
+    fillUnitMenus();
+    unitAType.value = "m";
+    unitBType.value = "ft";
+    fromA();
+
+    showLanding();
+  </script>
+</body>
+</html>
